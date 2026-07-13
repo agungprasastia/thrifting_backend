@@ -61,6 +61,23 @@ npm run start:dev
 ```
 Aplikasi akan berjalan di port `3000` (atau sesuai konfigurasi env) di alamat: `http://localhost:3000`.
 
+### 6. Dokumentasi API (Swagger)
+Setelah server berjalan, Anda dapat mengakses Swagger UI interaktif untuk melihat seluruh rute dan dokumentasi API di:
+`http://localhost:3000/docs`
+
+---
+
+## Pemeliharaan Kode (Linting & Formatting)
+
+- **Format Kode** (Prettier):
+  ```bash
+  npm run format
+  ```
+- **Lint Kode** (ESLint):
+  ```bash
+  npm run lint
+  ```
+
 ---
 
 ## Pengujian (Testing)
