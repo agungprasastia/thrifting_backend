@@ -37,8 +37,22 @@ export class ProductsService {
   }
 
   async findAll(status?: ProductStatus) {
+    const where = status ? { status } : {};
+    return this.prisma.product.findMany({ where });
+  }
+
+  async findLatest() {
     return this.prisma.product.findMany({
-      where: status ? { status } : {},
+      orderBy: { createdAt: 'desc' },
+      take: 10,
+    });
+  }
+
+  async findPopular() {
+    // In a real app, this might be based on views or sales
+    // For now, return random or just a fixed number
+    return this.prisma.product.findMany({
+      take: 8,
     });
   }
 

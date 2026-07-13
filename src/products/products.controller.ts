@@ -125,6 +125,16 @@ export class ProductsController {
     return this.productsService.findAll(status);
   }
 
+  @Get('latest')
+  findLatest() {
+    return this.productsService.findLatest();
+  }
+
+  @Get('popular')
+  findPopular() {
+    return this.productsService.findPopular();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.productsService.findOne(id);
