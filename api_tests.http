@@ -1,0 +1,65 @@
+### Base URL
+@baseUrl = http://localhost:3000
+
+### 1. Registrasi Admin
+# @name registerAdmin
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "admin@thrift.com",
+  "password": "password123"
+}
+
+### 2. Login Admin
+# @name loginAdmin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@thrift.com",
+  "password": "password123"
+}
+
+### Save JWT Token
+@authToken = {{loginAdmin.response.body.access_token}}
+
+### 3. Tambah Produk Baru (Membutuhkan Auth Token)
+POST {{baseUrl}}/products
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "Hoodie Vintage Gap",
+  "description": "Kondisi sangat baik, warna hitam pekat, karet kencang.",
+  "price": 185000,
+  "size": "XL",
+  "category": "Hoodie",
+  "condition": "9.5/10",
+  "imageUrls": [
+    "https://res.cloudinary.com/demo/image/upload/sample.jpg"
+  ]
+}
+
+### 4. Dapatkan Semua Produk Aktif (Public)
+GET {{baseUrl}}/products?status=AVAILABLE
+
+### 5. Dapatkan Detail Produk (Public)
+GET {{baseUrl}}/products/ganti-dengan-id-produk-dari-list
+
+### 6. Checkout Keranjang Belanja (Public)
+POST {{baseUrl}}/orders
+Content-Type: application/json
+
+{
+  "customerName": "Agung",
+  "customerPhone": "08123456789",
+  "customerAddress": "Jl. Mawar No. 12, Bandung",
+  "productIds": [
+    "ganti-dengan-id-produk-dari-list"
+  ]
+}
+
+### 7. Dapatkan Semua Order (Membutuhkan Auth Token)
+GET {{baseUrl}}/orders
+Authorization: Bearer {{authToken}}
