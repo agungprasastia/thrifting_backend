@@ -96,7 +96,21 @@ async function main() {
     ];
 
     for (const p of sampleProducts) {
-      await prisma.product.create({ data: p });
+      const { category, ...productData } = p;
+      await prisma.product.create({
+        data: {
+          ...productData,
+          category: {
+            connectOrCreate: {
+              where: { name: category },
+              create: {
+                name: category,
+                slug: category.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+              },
+            },
+          },
+        },
+      });
     }
     console.log('Successfully seeded database with sample products!');
   } else {
