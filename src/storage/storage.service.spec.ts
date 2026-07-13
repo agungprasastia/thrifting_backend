@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { StorageService } from './storage.service';
 import { ConfigService } from '@nestjs/config';
 import { createClient } from '@supabase/supabase-js';
+import { Readable } from 'stream';
 
 // Mock Supabase client
 jest.mock('@supabase/supabase-js', () => ({
@@ -10,7 +11,6 @@ jest.mock('@supabase/supabase-js', () => ({
 
 describe('StorageService', () => {
   let service: StorageService;
-  let configService: ConfigService;
 
   const mockUpload = jest.fn();
   const mockGetPublicUrl = jest.fn();
@@ -31,7 +31,7 @@ describe('StorageService', () => {
     mimetype: 'image/jpeg',
     buffer: Buffer.from('dummy-image-data'),
     size: 1024,
-    stream: null as any,
+    stream: null as unknown as Readable,
     destination: '',
     filename: '',
     path: '',
@@ -58,7 +58,6 @@ describe('StorageService', () => {
     }).compile();
 
     service = module.get<StorageService>(StorageService);
-    configService = module.get<ConfigService>(ConfigService);
   });
 
   afterEach(() => {
@@ -71,9 +70,15 @@ describe('StorageService', () => {
 
   describe('uploadFile', () => {
     it('should successfully upload file and return public URL', async () => {
-      mockUpload.mockResolvedValue({ data: { path: 'uploads/test.jpg' }, error: null });
+      mockUpload.mockResolvedValue({
+        data: { path: 'uploads/test.jpg' },
+        error: null,
+      });
       mockGetPublicUrl.mockReturnValue({
-        data: { publicUrl: 'https://test.supabase.co/storage/v1/object/public/thrift-images/uploads/test.jpg' },
+        data: {
+          publicUrl:
+            'https://test.supabase.co/storage/v1/object/public/thrift-images/uploads/test.jpg',
+        },
       });
 
       const url = await service.uploadFile(mockFile);
@@ -83,7 +88,9 @@ describe('StorageService', () => {
         mockFile.buffer,
         { contentType: mockFile.mimetype, upsert: true },
       );
-      expect(url).toBe('https://test.supabase.co/storage/v1/object/public/thrift-images/uploads/test.jpg');
+      expect(url).toBe(
+        'https://test.supabase.co/storage/v1/object/public/thrift-images/uploads/test.jpg',
+      );
     });
 
     it('should throw error if Supabase upload fails', async () => {
@@ -92,7 +99,9 @@ describe('StorageService', () => {
         error: new Error('Upload error'),
       });
 
-      await expect(service.uploadFile(mockFile)).rejects.toThrow('Upload error');
+      await expect(service.uploadFile(mockFile)).rejects.toThrow(
+        'Upload error',
+      );
     });
   });
 });

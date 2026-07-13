@@ -62,9 +62,14 @@ describe('AuthService', () => {
 
       (bcrypt.hash as jest.Mock).mockResolvedValue('hashed_password');
 
-      const result = await service.register(registerDto.email, registerDto.password);
+      const result = await service.register(
+        registerDto.email,
+        registerDto.password,
+      );
 
-      expect(prisma.user.findUnique).toHaveBeenCalledWith({ where: { email: registerDto.email } });
+      expect(prisma.user.findUnique).toHaveBeenCalledWith({
+        where: { email: registerDto.email },
+      });
       expect(bcrypt.hash).toHaveBeenCalledWith(registerDto.password, 10);
       expect(prisma.user.create).toHaveBeenCalledWith({
         data: {
@@ -73,7 +78,11 @@ describe('AuthService', () => {
           role: 'ADMIN',
         },
       });
-      expect(result).toEqual({ id: '123', email: registerDto.email, role: 'ADMIN' });
+      expect(result).toEqual({
+        id: '123',
+        email: registerDto.email,
+        role: 'ADMIN',
+      });
     });
 
     it('should throw ConflictException if email already exists', async () => {
@@ -82,9 +91,9 @@ describe('AuthService', () => {
         email: registerDto.email,
       });
 
-      await expect(service.register(registerDto.email, registerDto.password)).rejects.toThrow(
-        ConflictException,
-      );
+      await expect(
+        service.register(registerDto.email, registerDto.password),
+      ).rejects.toThrow(ConflictException);
       expect(prisma.user.create).not.toHaveBeenCalled();
     });
   });
@@ -104,27 +113,36 @@ describe('AuthService', () => {
 
       const result = await service.login(loginDto.email, loginDto.password);
 
-      expect(prisma.user.findUnique).toHaveBeenCalledWith({ where: { email: loginDto.email } });
-      expect(bcrypt.compare).toHaveBeenCalledWith(loginDto.password, dbUser.password);
-      expect(jwt.sign).toHaveBeenCalledWith({ sub: dbUser.id, email: dbUser.email, role: dbUser.role });
+      expect(prisma.user.findUnique).toHaveBeenCalledWith({
+        where: { email: loginDto.email },
+      });
+      expect(bcrypt.compare).toHaveBeenCalledWith(
+        loginDto.password,
+        dbUser.password,
+      );
+      expect(jwt.sign).toHaveBeenCalledWith({
+        sub: dbUser.id,
+        email: dbUser.email,
+        role: dbUser.role,
+      });
       expect(result).toEqual({ access_token: 'test_token' });
     });
 
     it('should throw UnauthorizedException for non-existent user', async () => {
       mockPrismaService.user.findUnique.mockResolvedValue(null);
 
-      await expect(service.login(loginDto.email, loginDto.password)).rejects.toThrow(
-        UnauthorizedException,
-      );
+      await expect(
+        service.login(loginDto.email, loginDto.password),
+      ).rejects.toThrow(UnauthorizedException);
     });
 
     it('should throw UnauthorizedException for incorrect password', async () => {
       mockPrismaService.user.findUnique.mockResolvedValue(dbUser);
       (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
-      await expect(service.login(loginDto.email, loginDto.password)).rejects.toThrow(
-        UnauthorizedException,
-      );
+      await expect(
+        service.login(loginDto.email, loginDto.password),
+      ).rejects.toThrow(UnauthorizedException);
     });
   });
 });

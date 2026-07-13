@@ -16,6 +16,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { ProductStatus } from '@prisma/client';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { StorageService } from '../storage/storage.service';
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
 import {
   IsString,
   IsNotEmpty,
@@ -92,6 +93,8 @@ export class UpdateProductDto {
   imageUrls?: string[];
 }
 
+@ApiTags('Products')
+@ApiBearerAuth()
 @Controller('products')
 export class ProductsController {
   constructor(

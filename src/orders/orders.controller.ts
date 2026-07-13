@@ -1,19 +1,7 @@
-import {
-  Controller,
-  Post,
-  Body,
-  Get,
-  Param,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, UseGuards } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import {
-  IsString,
-  IsNotEmpty,
-  IsArray,
-  ArrayNotEmpty,
-} from 'class-validator';
+import { IsString, IsNotEmpty, IsArray, ArrayNotEmpty } from 'class-validator';
 
 export class CreateOrderDto {
   @IsString({ message: 'Nama pelanggan harus berupa string' })
@@ -34,6 +22,10 @@ export class CreateOrderDto {
   productIds!: string[];
 }
 
+import { ApiTags, ApiBearerAuth } from '@nestjs/swagger';
+
+@ApiTags('Orders')
+@ApiBearerAuth()
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}

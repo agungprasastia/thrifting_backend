@@ -20,7 +20,9 @@ describe('Thrifting API (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+    app.useGlobalPipes(
+      new ValidationPipe({ whitelist: true, transform: true }),
+    );
     await app.init();
 
     prisma = moduleFixture.get<PrismaService>(PrismaService);
@@ -29,7 +31,9 @@ describe('Thrifting API (e2e)', () => {
   afterAll(async () => {
     // Cleanup test data
     if (testProductId) {
-      await prisma.orderItem.deleteMany({ where: { productId: testProductId } });
+      await prisma.orderItem.deleteMany({
+        where: { productId: testProductId },
+      });
       await prisma.product.deleteMany({ where: { id: testProductId } });
     }
     await prisma.user.deleteMany({ where: { email: testEmail } });
@@ -125,7 +129,9 @@ describe('Thrifting API (e2e)', () => {
     expect(response.body.totalAmount).toBe(250000);
 
     // Verify product status is now SOLD_OUT
-    const product = await prisma.product.findUnique({ where: { id: testProductId } });
+    const product = await prisma.product.findUnique({
+      where: { id: testProductId },
+    });
     expect(product?.status).toBe('SOLD_OUT');
   });
 

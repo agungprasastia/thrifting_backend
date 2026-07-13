@@ -15,7 +15,9 @@ export class OrdersService {
 
   async create(dto: CreateOrderDto) {
     if (!dto.productIds || dto.productIds.length === 0) {
-      throw new BadRequestException('Order harus memiliki minimal satu produk.');
+      throw new BadRequestException(
+        'Order harus memiliki minimal satu produk.',
+      );
     }
 
     return this.prisma.$transaction(async (tx) => {
@@ -28,11 +30,15 @@ export class OrdersService {
         });
 
         if (!product) {
-          throw new BadRequestException(`Produk dengan ID ${productId} tidak ditemukan.`);
+          throw new BadRequestException(
+            `Produk dengan ID ${productId} tidak ditemukan.`,
+          );
         }
 
         if (product.status === ProductStatus.SOLD_OUT) {
-          throw new BadRequestException(`Produk "${product.name}" sudah terjual (Sold Out).`);
+          throw new BadRequestException(
+            `Produk "${product.name}" sudah terjual (Sold Out).`,
+          );
         }
 
         // Update product status to SOLD_OUT to prevent double purchase

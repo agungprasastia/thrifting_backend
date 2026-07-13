@@ -1,16 +1,17 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { createClient } from '@supabase/supabase-js';
 
 @Injectable()
 export class StorageService {
-  private supabase: SupabaseClient;
+  private supabase: ReturnType<typeof createClient>;
   private bucket: string;
 
   constructor(configService: ConfigService) {
     const supabaseUrl = configService.get<string>('SUPABASE_URL');
     const supabaseKey = configService.get<string>('SUPABASE_KEY');
-    this.bucket = configService.get<string>('SUPABASE_BUCKET') || 'thrift-images';
+    this.bucket =
+      configService.get<string>('SUPABASE_BUCKET') || 'thrift-images';
 
     if (!supabaseUrl || !supabaseKey) {
       throw new Error('SUPABASE_URL and SUPABASE_KEY must be defined in env.');
@@ -24,7 +25,7 @@ export class StorageService {
     const uniqueFileName = `${Date.now()}-${sanitizedName}`;
     const filePath = `uploads/${uniqueFileName}`;
 
-    const { data, error } = await this.supabase.storage
+    const { error } = await this.supabase.storage
       .from(this.bucket)
       .upload(filePath, file.buffer, {
         contentType: file.mimetype,
