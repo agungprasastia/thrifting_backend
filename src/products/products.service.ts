@@ -28,10 +28,20 @@ export class ProductsService {
   constructor(private prisma: PrismaService) {}
 
   async create(dto: CreateProductDto) {
+    const { category, ...productData } = dto;
     return this.prisma.product.create({
       data: {
-        ...dto,
+        ...productData,
         status: ProductStatus.AVAILABLE,
+        category: {
+          connectOrCreate: {
+            where: { name: category },
+            create: {
+              name: category,
+              slug: category.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+            },
+          },
+        },
       },
     });
   }
@@ -71,9 +81,24 @@ export class ProductsService {
   async update(id: string, dto: UpdateProductDto) {
     await this.findOne(id); // Throws NotFoundException if not found
 
+    const { category, ...productData } = dto;
+
     return this.prisma.product.update({
       where: { id },
-      data: dto,
+      data: {
+        ...productData,
+        ...(category && {
+          category: {
+            connectOrCreate: {
+              where: { name: category },
+              create: {
+                name: category,
+                slug: category.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+              },
+            },
+          },
+        }),
+      },
     });
   }
 
