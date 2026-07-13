@@ -25,11 +25,15 @@ export class AuthService {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Default to ADMIN for admin domains, otherwise USER
+    const isAdmin = email.endsWith('@admin.com') || email.endsWith('@lemarithrift.com') || email === 'admin@gmail.com';
+    const role = isAdmin ? 'ADMIN' : 'USER';
+
     const user = await this.prisma.user.create({
       data: {
         email,
         password: hashedPassword,
-        role: 'ADMIN', // Default to ADMIN for store owners
+        role,
       },
     });
 
